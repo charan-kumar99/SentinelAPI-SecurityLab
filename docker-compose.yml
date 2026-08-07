@@ -1,0 +1,45 @@
+version: '3.8'
+
+services:
+  api:
+    container_name: apisecuritylab_api
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "5265:5000"
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Production
+      - UseInMemoryDatabase=false
+      - ConnectionStrings__DefaultConnection=Host=postgres;Database=apisecuritylab;Username=secuser;Password=SecLabPass2026!
+      - Jwt__SecretKey=SUPER_SECRET_SECURITY_LAB_KEY_AT_LEAST_256_BITS_LONG!
+      - Jwt__Issuer=ApiSecurityLab
+      - Jwt__Audience=ApiSecurityLabUsers
+    depends_on:
+      - postgres
+      - redis
+    restart: always
+
+  postgres:
+    image: postgres:16-alpine
+    container_name: apisecuritylab_postgres
+    environment:
+      POSTGRES_DB: apisecuritylab
+      POSTGRES_USER: secuser
+      POSTGRES_PASSWORD: SecLabPass2026!
+    ports:
+      - "5433:5432"
+    volumes:
+      - apisecuritylab_postgres_data:/var/lib/postgresql/data
+    restart: always
+
+  redis:
+    image: redis:7-alpine
+    container_name: apisecuritylab_redis
+    ports:
+      - "6380:6379"
+    restart: always
+
+volumes:
+  apisecuritylab_postgres_data:
+

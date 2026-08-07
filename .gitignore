@@ -1,0 +1,23 @@
+# .NET ignore
+bin/
+obj/
+out/
+.vs/
+.idea/
+*.user
+*.userosscache
+*.sln.docstates
+
+# Flutter ignore
+.dart_tool/
+.flutter-plugins
+.flutter-plugins-dependencies
+.pub-cache/
+.pub/
+build/
+
+# Docker & OS ignore
+.DS_Store
+Thumbs.db
+*.log
+scratch/
