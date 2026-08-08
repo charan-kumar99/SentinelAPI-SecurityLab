@@ -1,0 +1,9 @@
+.git
+.gitignore
+client/
+bin/
+obj/
+*.user
+*.suo
+.vs/
+.vscode/
