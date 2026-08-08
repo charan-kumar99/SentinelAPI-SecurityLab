@@ -1,4 +1,4 @@
-# 🛡️ API Security Lab — Defensive Cyber Workbench (.NET 10)
+# 🛡️ SentinelAPI — Defensive Cyber Security Lab (.NET 10)
 
 An enterprise-grade **Cyber Security & Defensive API Lab** engineered with **ASP.NET Core 10 (.NET 10)**, **PostgreSQL**, **Redis**, and a cross-platform **Flutter Defensive Operations Workbench**.
 
@@ -25,10 +25,10 @@ Designed to demonstrate production-grade implementation of **OWASP API Security 
 ```mermaid
 graph TD
     subgraph Frontend [Defensive Client Layer]
-        A[Flutter Security Workbench\nclient/sentinel_api_flutter]
+        A[Sentinel Flutter Workbench\nclient/sentinel_api_flutter]
     end
 
-    subgraph Backend [.NET 10 Cyber Core]
+    subgraph Backend [SentinelAPI .NET 10 Core]
         B[ASP.NET Core 10 Web API]
         C[Security Middlewares\nCSP, Rate Limiting, Audit Telemetry]
         D[Cryptographic Engine\nArgon2id, AES-256-GCM, HMAC-SHA256]
@@ -59,13 +59,13 @@ docker compose up -d --build
 ```
 
 Access Services:
-* **API Security Server**: `http://localhost:5265`
+* **SentinelAPI Server**: `http://localhost:5265`
 * **PostgreSQL Database**: `localhost:5433` (`Database=sentinel_db`, `Username=secuser`, `Password=SecLabPass2026!`)
 * **Redis Security Cache**: `localhost:6380`
 
 ---
 
-## 💙 Flutter Security Workbench
+## 💙 Sentinel Flutter Security Workbench
 
 The project includes a full **Flutter (Dart)** client application located in `client/sentinel_api_flutter`.
 

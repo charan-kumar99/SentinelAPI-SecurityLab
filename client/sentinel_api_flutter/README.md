@@ -1,6 +1,6 @@
-# 🛡️ API Security Lab — Flutter Defensive Operations Client
+# 🛡️ SentinelAPI — Flutter Defensive Operations Client
 
-A cross-platform **Flutter (Dart)** Security Operations Workbench designed to interface with the **ASP.NET Core 10 Cyber Security API**.
+A cross-platform **Flutter (Dart)** Security Operations Workbench designed to interface with the **SentinelAPI .NET 10 Cyber Security API**.
 
 ---
 
@@ -36,4 +36,4 @@ flutter build web
 ## 🛠️ Technology Stack
 - **Framework**: Flutter 3.x / Dart 3.x
 - **UI Design**: Material 3 Dark Cyber Theme, Google Fonts (`Outfit` & `Fira Code`)
-- **Networking**: `http` REST API Client connecting to ASP.NET Core 10 Backend at `http://localhost:5265`
+- **Networking**: `http` REST API Client connecting to SentinelAPI Backend at `http://localhost:5265`
