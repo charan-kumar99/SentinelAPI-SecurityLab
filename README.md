@@ -25,7 +25,7 @@ Designed to demonstrate production-grade implementation of **OWASP API Security 
 ```mermaid
 graph TD
     subgraph Frontend [Defensive Client Layer]
-        A[Flutter Security Workbench\nclient/api_security_lab_flutter]
+        A[Flutter Security Workbench\nclient/sentinel_api_flutter]
     end
 
     subgraph Backend [.NET 10 Cyber Core]
@@ -60,18 +60,18 @@ docker compose up -d --build
 
 Access Services:
 * **API Security Server**: `http://localhost:5265`
-* **PostgreSQL Database**: `localhost:5433` (`Database=apisecuritylab`, `Username=secuser`, `Password=SecLabPass2026!`)
+* **PostgreSQL Database**: `localhost:5433` (`Database=sentinel_db`, `Username=secuser`, `Password=SecLabPass2026!`)
 * **Redis Security Cache**: `localhost:6380`
 
 ---
 
 ## 💙 Flutter Security Workbench
 
-The project includes a full **Flutter (Dart)** client application located in `client/api_security_lab_flutter`.
+The project includes a full **Flutter (Dart)** client application located in `client/sentinel_api_flutter`.
 
 To run the Flutter app natively:
 ```powershell
-cd client/api_security_lab_flutter
+cd client/sentinel_api_flutter
 flutter run -d chrome
 ```
 
@@ -81,5 +81,5 @@ flutter run -d chrome
 
 Run xUnit security tests to verify cryptographic invariants:
 ```powershell
-dotnet test tests/ApiSecurityLab.Tests/ApiSecurityLab.Tests.csproj
+dotnet test tests/SentinelApi.Tests/SentinelApi.Tests.csproj
 ```

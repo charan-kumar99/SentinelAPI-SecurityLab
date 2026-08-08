@@ -1,45 +1,39 @@
-version: '3.8'
-
 services:
-  api:
-    container_name: apisecuritylab_api
-    build:
-      context: .
-      dockerfile: Dockerfile
-    ports:
-      - "5265:5000"
-    environment:
-      - ASPNETCORE_ENVIRONMENT=Production
-      - UseInMemoryDatabase=false
-      - ConnectionStrings__DefaultConnection=Host=postgres;Database=apisecuritylab;Username=secuser;Password=SecLabPass2026!
-      - Jwt__SecretKey=SUPER_SECRET_SECURITY_LAB_KEY_AT_LEAST_256_BITS_LONG!
-      - Jwt__Issuer=ApiSecurityLab
-      - Jwt__Audience=ApiSecurityLabUsers
-    depends_on:
-      - postgres
-      - redis
-    restart: always
-
-  postgres:
+  sentinel_postgres:
     image: postgres:16-alpine
-    container_name: apisecuritylab_postgres
+    container_name: sentinel_postgres
     environment:
-      POSTGRES_DB: apisecuritylab
+      POSTGRES_DB: sentinel_db
       POSTGRES_USER: secuser
       POSTGRES_PASSWORD: SecLabPass2026!
     ports:
       - "5433:5432"
     volumes:
-      - apisecuritylab_postgres_data:/var/lib/postgresql/data
-    restart: always
+      - postgres_data:/var/lib/postgresql/data
+    restart: unless-stopped
 
-  redis:
+  sentinel_redis:
     image: redis:7-alpine
-    container_name: apisecuritylab_redis
+    container_name: sentinel_redis
     ports:
       - "6380:6379"
-    restart: always
+    restart: unless-stopped
+
+  sentinel_api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: sentinel_api
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Production
+      - ConnectionStrings__DefaultConnection=Host=sentinel_postgres;Port=5432;Database=sentinel_db;Username=secuser;Password=SecLabPass2026!
+      - Redis__ConnectionString=sentinel_redis:6379
+    ports:
+      - "5265:8080"
+    depends_on:
+      - sentinel_postgres
+      - sentinel_redis
+    restart: unless-stopped
 
 volumes:
-  apisecuritylab_postgres_data:
-
+  postgres_data:
