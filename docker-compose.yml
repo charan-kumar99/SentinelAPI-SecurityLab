@@ -26,6 +26,7 @@ services:
     container_name: sentinel_api
     environment:
       - ASPNETCORE_ENVIRONMENT=Production
+      - UseInMemoryDatabase=false
       - ConnectionStrings__DefaultConnection=Host=sentinel_postgres;Port=5432;Database=sentinel_db;Username=secuser;Password=SecLabPass2026!
       - Redis__ConnectionString=sentinel_redis:6379
     ports:

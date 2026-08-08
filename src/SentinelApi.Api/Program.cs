@@ -21,10 +21,10 @@ using Microsoft.OpenApi;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// 1. Database Configuration (Use In-Memory DB by default for lightweight local execution, or PostgreSQL if configured)
-bool useInMemory = builder.Configuration.GetValue<bool>("UseInMemoryDatabase", true);
+// 1. Database Configuration (Uses PostgreSQL when connection string is provided, or in-memory if specified)
+bool useInMemory = builder.Configuration.GetValue<bool>("UseInMemoryDatabase", false);
 string connectionString = builder.Configuration.GetConnectionString("DefaultConnection") 
-    ?? "Host=localhost;Database=sentinel_db;Username=postgres;Password=postgres";
+    ?? "Host=localhost;Port=5433;Database=sentinel_db;Username=secuser;Password=SecLabPass2026!";
 
 builder.Services.AddDbContext<AppDbContext>(options =>
 {
