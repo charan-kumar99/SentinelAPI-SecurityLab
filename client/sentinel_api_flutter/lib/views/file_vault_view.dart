@@ -48,7 +48,7 @@ class _FileVaultViewState extends State<FileVaultView> {
       return;
     }
     try {
-      final result = await FilePicker.platform.pickFiles(withData: true);
+      final result = await FilePicker.pickFiles(withData: true);
       if (result != null && result.files.isNotEmpty) {
         final file = result.files.first;
         if (file.bytes != null) {

@@ -9,6 +9,7 @@ import 'views/sandbox_view.dart';
 import 'views/crypto_view.dart';
 import 'views/rate_limit_view.dart';
 import 'views/audit_view.dart';
+import 'widgets/cyber_footer.dart';
 
 void main() {
   runApp(const SentinelApiApp());
@@ -176,6 +177,9 @@ class _MainDashboardScreenState extends State<MainDashboardScreen>
                 ],
               ),
             ),
+
+            // Bottom DevSecOps Cyber Footer
+            const CyberFooter(),
           ],
         ),
       ),
