@@ -108,11 +108,21 @@ class _FileVaultViewState extends State<FileVaultView> {
     });
 
     if (res['success'] == true) {
+      if (res['fileMetadata'] != null) {
+        try {
+          final newMeta = FileMetadataDto.fromJson(res['fileMetadata']);
+          setState(() {
+            _files.removeWhere((f) => f.id == newMeta.id);
+            _files.insert(0, newMeta);
+          });
+          _generateSignedUrl(newMeta);
+        } catch (_) {}
+      }
       _loadFiles();
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
-            content: Text('File passed magic byte validation, encrypted with AES-256, and saved!'),
+            content: Text('File validated, AES-256 encrypted, and Signed Download URL generated!'),
             backgroundColor: CyberTheme.emeraldNeon,
           ),
         );
@@ -134,7 +144,7 @@ class _FileVaultViewState extends State<FileVaultView> {
     final res = await ApiService.generateSignedUrl(file.id, expirationSeconds: _expirationSeconds);
     setState(() {
       _loading = false;
-      _signedUrlOutput = const JsonEncoder.withIndent('  ').convert(res);
+      _signedUrlOutput = '--- HMAC-SHA256 SIGNED URL GENERATED ---\nFile: ${file.originalFileName}\nTTL: $_expirationSeconds seconds\n\n${const JsonEncoder.withIndent('  ').convert(res)}';
     });
   }
 
@@ -310,7 +320,7 @@ class _FileVaultViewState extends State<FileVaultView> {
                                           style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 12.5),
                                         ),
                                         subtitle: Text(
-                                          '${f.fileSizeBytes} B • ${f.contentType} • SHA: ${f.sha256Hash.substring(0, 10)}...',
+                                          '${f.fileSizeBytes} B • ${f.contentType} • SHA: ${f.sha256Hash.length >= 10 ? f.sha256Hash.substring(0, 10) : f.sha256Hash}...',
                                           style: const TextStyle(fontSize: 10.5, color: CyberTheme.textMuted),
                                         ),
                                         trailing: Row(

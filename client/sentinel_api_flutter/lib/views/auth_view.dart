@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../services/api_service.dart';
@@ -17,8 +18,8 @@ class AuthView extends StatefulWidget {
 }
 
 class _AuthViewState extends State<AuthView> {
-  final _usernameController = TextEditingController(text: 'sentinel_admin');
-  final _emailController = TextEditingController(text: 'admin@sentinel.sec');
+  final _usernameController = TextEditingController(text: 'devsecops_tester');
+  final _emailController = TextEditingController(text: 'tester@sentinel.sec');
   final _passwordController = TextEditingController(text: 'Argon2idPass2026!');
   final _roleController = TextEditingController(text: 'Admin');
   final _sensitiveNoteController = TextEditingController(
@@ -51,6 +52,14 @@ class _AuthViewState extends State<AuthView> {
     }
   }
 
+  void _generateFreshIdentity() {
+    final rand = math.Random().nextInt(9000) + 1000;
+    setState(() {
+      _usernameController.text = 'sentinel_agent_$rand';
+      _emailController.text = 'agent_$rand@sentinel.sec';
+    });
+  }
+
   Future<void> _handleRegister() async {
     setState(() => _loading = true);
     final res = await ApiService.register(
@@ -70,7 +79,7 @@ class _AuthViewState extends State<AuthView> {
     if (mounted) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text(res['success'] == true ? 'Registered successfully! Argon2id password hash created.' : 'Registration failed: ${res['message']}'),
+          content: Text(res['success'] == true ? 'Registered successfully! Argon2id password hash created.' : '${res['message'] ?? res['error']}'),
           backgroundColor: res['success'] == true ? CyberTheme.emeraldNeon : CyberTheme.crimsonNeon,
         ),
       );
@@ -203,6 +212,7 @@ class _AuthViewState extends State<AuthView> {
                           Row(
                             children: [
                               Expanded(
+                                flex: 3,
                                 child: ElevatedButton.icon(
                                   style: ElevatedButton.styleFrom(
                                     backgroundColor: CyberTheme.primaryNeon,
@@ -214,8 +224,9 @@ class _AuthViewState extends State<AuthView> {
                                   onPressed: _loading ? null : _handleRegister,
                                 ),
                               ),
-                              const SizedBox(width: 12),
+                              const SizedBox(width: 8),
                               Expanded(
+                                flex: 3,
                                 child: OutlinedButton.icon(
                                   style: OutlinedButton.styleFrom(
                                     side: const BorderSide(color: CyberTheme.primaryNeon),
@@ -226,6 +237,17 @@ class _AuthViewState extends State<AuthView> {
                                   label: const Text('LOGIN (GET JWT)', style: TextStyle(fontWeight: FontWeight.w900)),
                                   onPressed: _loading ? null : _handleLogin,
                                 ),
+                              ),
+                              const SizedBox(width: 8),
+                              IconButton(
+                                tooltip: 'Generate Random Unique User & Email',
+                                style: IconButton.styleFrom(
+                                  backgroundColor: CyberTheme.secondaryNeon.withOpacity(0.15),
+                                  side: BorderSide(color: CyberTheme.secondaryNeon.withOpacity(0.5)),
+                                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                                ),
+                                icon: const Icon(Icons.shuffle_rounded, size: 18, color: CyberTheme.secondaryNeon),
+                                onPressed: _generateFreshIdentity,
                               ),
                             ],
                           ),
@@ -329,8 +351,11 @@ class _AuthViewState extends State<AuthView> {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          Wrap(
+                            spacing: 12,
+                            runSpacing: 8,
+                            alignment: WrapAlignment.spaceBetween,
+                            crossAxisAlignment: WrapCrossAlignment.center,
                             children: [
                               const Text(
                                 'Exchange current refresh token for a brand new pair and revoke old token:',

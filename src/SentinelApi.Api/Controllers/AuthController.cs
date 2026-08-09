@@ -42,7 +42,12 @@ public class AuthController : ControllerBase
 
         if (await _db.Users.AnyAsync(u => u.Username.ToLower() == request.Username.ToLower()))
         {
-            return Conflict(new AuthResponse(false, "Username is already taken.", null, null, null));
+            return Conflict(new AuthResponse(false, "Username is already taken. Please choose another username.", null, null, null));
+        }
+
+        if (!string.IsNullOrWhiteSpace(request.Email) && await _db.Users.AnyAsync(u => u.Email.ToLower() == request.Email.ToLower()))
+        {
+            return Conflict(new AuthResponse(false, "Email is already registered. Please log in or use a different email.", null, null, null));
         }
 
         var (hash, salt) = _passwordHasher.HashPassword(request.Password);
@@ -59,8 +64,15 @@ public class AuthController : ControllerBase
             CreatedAt = DateTime.UtcNow
         };
 
-        _db.Users.Add(user);
-        await _db.SaveChangesAsync();
+        try
+        {
+            _db.Users.Add(user);
+            await _db.SaveChangesAsync();
+        }
+        catch (DbUpdateException)
+        {
+            return Conflict(new AuthResponse(false, "A user with this username or email already exists.", null, null, null));
+        }
 
         var accessToken = _jwtService.GenerateAccessToken(user);
         var refreshToken = _jwtService.GenerateRefreshToken(user);

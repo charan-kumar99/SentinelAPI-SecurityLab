@@ -148,12 +148,15 @@ class CyberMetricTile extends StatelessWidget {
               children: [
                 Row(
                   children: [
-                    Text(
-                      title,
-                      style: GoogleFonts.outfit(
-                        fontWeight: FontWeight.w800,
-                        fontSize: 13.5,
-                        color: color,
+                    Flexible(
+                      child: Text(
+                        title,
+                        overflow: TextOverflow.ellipsis,
+                        style: GoogleFonts.outfit(
+                          fontWeight: FontWeight.w800,
+                          fontSize: 13.5,
+                          color: color,
+                        ),
                       ),
                     ),
                     if (badge != null) ...[

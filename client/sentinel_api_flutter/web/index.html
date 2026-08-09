@@ -10,17 +10,18 @@
 
     For more details:
     * https://developer.mozilla.org/en-US/docs/Web/HTML/Element/base
-
+  -->
   <base href="/">
 
   <meta charset="UTF-8">
   <meta content="IE=Edge" http-equiv="X-UA-Compatible">
-  <meta name="description" content="A new Flutter project.">
+  <meta name="description" content="SentinelAPI Security Lab - Enterprise Cyber Operations Dashboard">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
   <!-- iOS meta tags & icons -->
   <meta name="mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black">
-  <meta name="apple-mobile-web-app-title" content="sentinel_api_flutter">
+  <meta name="apple-mobile-web-app-title" content="SentinelAPI Security Lab">
   <link rel="apple-touch-icon" href="icons/Icon-192.png">
 
   <!-- Favicon -->
@@ -29,10 +30,55 @@
 
   <title>SentinelAPI Security Lab - Enterprise Cyber Operations</title>
   <link rel="manifest" href="manifest.json">
+
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      background-color: #060913;
+      overflow: hidden;
+    }
+    /* Loading spinner while Flutter initializes */
+    .loading-container {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      background-color: #060913;
+      color: #00F0FF;
+      font-family: 'Segoe UI', sans-serif;
+    }
+    .loading-container .spinner {
+      width: 48px;
+      height: 48px;
+      border: 3px solid rgba(0, 240, 255, 0.15);
+      border-top-color: #00F0FF;
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+    }
+    .loading-container p {
+      margin-top: 16px;
+      font-size: 14px;
+      opacity: 0.7;
+      letter-spacing: 1px;
+    }
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+  </style>
 </head>
 <body>
+  <div id="loading" class="loading-container">
+    <div class="spinner"></div>
+    <p>INITIALIZING SENTINEL API...</p>
+  </div>
   <script>
     window.flutterWebRenderer = "html";
+    window.addEventListener('flutter-first-frame', function() {
+      var loader = document.getElementById('loading');
+      if (loader) loader.remove();
+    });
   </script>
   <script src="flutter_bootstrap.js" async></script>
 </body>
