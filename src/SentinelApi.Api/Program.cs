@@ -151,28 +151,35 @@ builder.Services.AddSwaggerGen(options =>
 
 var app = builder.Build();
 
-// Auto-create database & apply tables
+// Auto-create database & apply tables safely
 using (var scope = app.Services.CreateScope())
 {
     var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+    var logger = scope.ServiceProvider.GetRequiredService<ILogger<Program>>();
     try
     {
-        var databaseCreator = db.Database.GetService<Microsoft.EntityFrameworkCore.Storage.IRelationalDatabaseCreator>();
-        if (databaseCreator != null)
+        if (useInMemory)
         {
-            if (!databaseCreator.Exists())
+            db.Database.EnsureCreated();
+            logger.LogInformation("In-Memory database initialized.");
+        }
+        else
+        {
+            // For PostgreSQL / Supabase
+            try
             {
-                databaseCreator.Create();
+                db.Database.EnsureCreated();
+                logger.LogInformation("PostgreSQL schema validated/created successfully.");
             }
-            if (!databaseCreator.HasTables())
+            catch (Exception ex)
             {
-                databaseCreator.CreateTables();
+                logger.LogWarning(ex, "Database.EnsureCreated encountered an issue (tables may already exist or pooler in transaction mode). Continuing startup...");
             }
         }
     }
-    catch
+    catch (Exception ex)
     {
-        db.Database.EnsureCreated();
+        logger.LogError(ex, "Error during DB initialization: {Message}", ex.Message);
     }
 }
 
@@ -216,7 +223,7 @@ static string NormalizePostgresConnectionString(string connStr)
             if (string.IsNullOrEmpty(database)) database = "postgres";
             int port = uri.Port > 0 ? uri.Port : 5432;
 
-            return $"Host={uri.Host};Port={port};Database={database};Username={username};Password={password};SSL Mode=Require;Trust Server Certificate=true;";
+            return $"Host={uri.Host};Port={port};Database={database};Username={username};Password={password};SSL Mode=Require;Trust Server Certificate=true;Timeout=15;Command Timeout=30;";
         }
         catch
         {
