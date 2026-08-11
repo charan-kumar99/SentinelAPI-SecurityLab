@@ -1,8 +1,9 @@
 import 'dart:convert';
 import 'dart:typed_data';
+// ignore: avoid_web_libraries_in_flutter
+import 'dart:html' as html;
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:file_picker/file_picker.dart';
 import '../models/file_models.dart';
 import '../services/api_service.dart';
 import '../theme/cyber_theme.dart';
@@ -48,13 +49,25 @@ class _FileVaultViewState extends State<FileVaultView> {
       return;
     }
     try {
-      final result = await FilePicker.pickFiles(withData: true);
-      if (result != null && result.files.isNotEmpty) {
-        final file = result.files.first;
-        if (file.bytes != null) {
-          _executeUpload(file.name, file.bytes!, 'application/octet-stream');
+      final uploadInput = html.FileUploadInputElement()..accept = '*/*';
+      uploadInput.click();
+
+      uploadInput.onChange.listen((e) {
+        final files = uploadInput.files;
+        if (files != null && files.isNotEmpty) {
+          final file = files[0];
+          final reader = html.FileReader();
+          reader.onLoadEnd.listen((e) {
+            final result = reader.result;
+            if (result is Uint8List) {
+              _executeUpload(file.name, result, file.type.isNotEmpty ? file.type : 'application/octet-stream');
+            } else if (result is List<int>) {
+              _executeUpload(file.name, Uint8List.fromList(result), file.type.isNotEmpty ? file.type : 'application/octet-stream');
+            }
+          });
+          reader.readAsArrayBuffer(file);
         }
-      }
+      });
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('File picker error: $e')),
