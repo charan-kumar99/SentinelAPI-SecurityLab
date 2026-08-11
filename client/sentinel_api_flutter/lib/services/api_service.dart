@@ -6,7 +6,10 @@ import '../models/file_models.dart';
 import '../models/audit_models.dart';
 
 class ApiService {
-  static String baseUrl = 'http://localhost:5265/api/v1';
+  static String baseUrl = const String.fromEnvironment(
+    'API_BASE_URL',
+    defaultValue: 'http://localhost:5265/api/v1',
+  );
 
   static String? accessToken;
   static String? refreshToken;
