@@ -37,6 +37,7 @@ public class JwtTokenService : IJwtTokenService
             new Claim(ClaimTypes.Name, user.Username),
             new Claim(ClaimTypes.Email, user.Email),
             new Claim(ClaimTypes.Role, user.Role),
+            new Claim("client_id", string.IsNullOrWhiteSpace(user.ClientId) ? "sentinel-core" : user.ClientId),
             new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
         };
 

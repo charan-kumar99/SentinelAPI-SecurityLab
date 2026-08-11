@@ -14,6 +14,7 @@ class ApiService {
   static String? currentEmail;
   static String? currentRole;
   static String? currentUserId;
+  static String? currentClientId;
 
   static bool get isLoggedIn => accessToken != null && accessToken!.isNotEmpty;
 
@@ -21,6 +22,9 @@ class ApiService {
     final map = {'Content-Type': 'application/json'};
     if (accessToken != null && accessToken!.isNotEmpty) {
       map['Authorization'] = 'Bearer $accessToken';
+    }
+    if (currentClientId != null && currentClientId!.isNotEmpty) {
+      map['X-Client-Id'] = currentClientId!;
     }
     return map;
   }
@@ -32,21 +36,51 @@ class ApiService {
     currentEmail = null;
     currentRole = null;
     currentUserId = null;
+    currentClientId = null;
   }
 
   // --- 1. Authentication Endpoints ---
 
   static Future<Map<String, dynamic>> register(
-      String username, String email, String password, String role) async {
+      String username, String email, String password, String role,
+      {String clientId = 'sentinel-core'}) async {
     try {
       final response = await http.post(
         Uri.parse('$baseUrl/auth/register'),
-        headers: {'Content-Type': 'application/json'},
+        headers: {
+          'Content-Type': 'application/json',
+          'X-Client-Id': clientId,
+        },
         body: jsonEncode({
           'username': username,
           'email': email,
           'password': password,
           'role': role,
+          'clientId': clientId,
+        }),
+      );
+      final data = jsonDecode(response.body) as Map<String, dynamic>;
+      // Note: Register no longer returns tokens — must verify email first
+      return data;
+    } catch (e) {
+      return {'success': false, 'message': 'Network error: $e'};
+    }
+  }
+
+  static Future<Map<String, dynamic>> verifyEmail(
+      String email, String otp,
+      {String clientId = 'sentinel-core'}) async {
+    try {
+      final response = await http.post(
+        Uri.parse('$baseUrl/auth/verify-email'),
+        headers: {
+          'Content-Type': 'application/json',
+          'X-Client-Id': clientId,
+        },
+        body: jsonEncode({
+          'email': email,
+          'otp': otp,
+          'clientId': clientId,
         }),
       );
       final data = jsonDecode(response.body) as Map<String, dynamic>;
@@ -58,6 +92,7 @@ class ApiService {
           currentEmail = data['user']['email']?.toString();
           currentRole = data['user']['role']?.toString();
           currentUserId = data['user']['id']?.toString();
+          currentClientId = data['user']['clientId']?.toString() ?? clientId;
         }
       }
       return data;
@@ -66,15 +101,41 @@ class ApiService {
     }
   }
 
+  static Future<Map<String, dynamic>> resendOtp(
+      String email,
+      {String clientId = 'sentinel-core'}) async {
+    try {
+      final response = await http.post(
+        Uri.parse('$baseUrl/auth/resend-otp'),
+        headers: {
+          'Content-Type': 'application/json',
+          'X-Client-Id': clientId,
+        },
+        body: jsonEncode({
+          'email': email,
+          'clientId': clientId,
+        }),
+      );
+      return jsonDecode(response.body) as Map<String, dynamic>;
+    } catch (e) {
+      return {'success': false, 'message': 'Network error: $e'};
+    }
+  }
+
   static Future<Map<String, dynamic>> login(
-      String usernameOrEmail, String password) async {
+      String usernameOrEmail, String password,
+      {String clientId = 'sentinel-core'}) async {
     try {
       final response = await http.post(
         Uri.parse('$baseUrl/auth/login'),
-        headers: {'Content-Type': 'application/json'},
+        headers: {
+          'Content-Type': 'application/json',
+          'X-Client-Id': clientId,
+        },
         body: jsonEncode({
           'usernameOrEmail': usernameOrEmail,
           'password': password,
+          'clientId': clientId,
         }),
       );
       final data = jsonDecode(response.body) as Map<String, dynamic>;
@@ -86,6 +147,7 @@ class ApiService {
           currentEmail = data['user']['email']?.toString();
           currentRole = data['user']['role']?.toString();
           currentUserId = data['user']['id']?.toString();
+          currentClientId = data['user']['clientId']?.toString() ?? clientId;
         }
       }
       return data;

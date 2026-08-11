@@ -4,6 +4,7 @@ class UserDto {
   final String email;
   final String role;
   final String createdAt;
+  final String clientId;
 
   UserDto({
     required this.id,
@@ -11,6 +12,7 @@ class UserDto {
     required this.email,
     required this.role,
     required this.createdAt,
+    this.clientId = 'sentinel-core',
   });
 
   factory UserDto.fromJson(Map<String, dynamic> json) {
@@ -20,6 +22,7 @@ class UserDto {
       email: json['email']?.toString() ?? '',
       role: json['role']?.toString() ?? 'User',
       createdAt: json['createdAt']?.toString() ?? '',
+      clientId: json['clientId']?.toString() ?? 'sentinel-core',
     );
   }
 }

@@ -1,5 +1,4 @@
-import 'dart:math' as math;
-import 'dart:ui' as ui;
+import 'dart:ui_web' as ui;
 // ignore: avoid_web_libraries_in_flutter
 import 'dart:html' as html;
 import 'package:flutter/material.dart';
@@ -177,7 +176,7 @@ class CyberFooter extends StatelessWidget {
 }
 
 // ──────────────────────────────────────────────
-// CK Logo Button — opens portfolio on click
+// CK Logo Button — opens portfolio on click (uses exact SVG)
 // ──────────────────────────────────────────────
 class _CKLogoButton extends StatefulWidget {
   @override
@@ -186,6 +185,45 @@ class _CKLogoButton extends StatefulWidget {
 
 class _CKLogoButtonState extends State<_CKLogoButton> {
   bool _hovered = false;
+  static bool _registered = false;
+
+  @override
+  void initState() {
+    super.initState();
+    if (!_registered) {
+      // ignore: undefined_prefixed_name
+      ui.platformViewRegistry.registerViewFactory('ck-logo-svg', (int viewId) {
+        final div = html.DivElement()
+          ..style.width = '100%'
+          ..style.height = '100%'
+          ..style.display = 'flex'
+          ..style.alignItems = 'center'
+          ..style.justifyContent = 'center';
+
+        // Use NodeTreeSanitizer.trusted to allow SVG elements
+        div.setInnerHtml(
+          '<svg viewBox="0 0 240 240" xmlns="http://www.w3.org/2000/svg" width="22" height="22">'
+          '<defs>'
+          '<linearGradient id="logoCkGrad_$viewId" x1="0%" y1="0%" x2="100%" y2="100%">'
+          '<stop offset="0%" stop-color="#00d4ff"/>'
+          '<stop offset="100%" stop-color="#00ffaa"/>'
+          '</linearGradient>'
+          '</defs>'
+          '<g fill="none" stroke="url(#logoCkGrad_$viewId)" stroke-width="22" stroke-linecap="round" stroke-linejoin="round">'
+          '<path d="M 129.96 81.43 A 60 60 0 1 0 129.96 158.57"/>'
+          '<line x1="156" y1="60" x2="156" y2="180"/>'
+          '<line x1="156" y1="120" x2="216" y2="60"/>'
+          '<line x1="156" y1="120" x2="216" y2="180"/>'
+          '</g>'
+          '</svg>',
+          treeSanitizer: html.NodeTreeSanitizer.trusted,
+        );
+
+        return div;
+      });
+      _registered = true;
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -201,6 +239,8 @@ class _CKLogoButtonState extends State<_CKLogoButton> {
           message: 'Visit Portfolio — charan-kumar99.github.io',
           child: AnimatedContainer(
             duration: const Duration(milliseconds: 200),
+            width: 32,
+            height: 32,
             padding: const EdgeInsets.all(5),
             decoration: BoxDecoration(
               color: _hovered
@@ -223,102 +263,11 @@ class _CKLogoButtonState extends State<_CKLogoButton> {
                     ]
                   : null,
             ),
-            child: CustomPaint(
-              size: const Size(22, 22),
-              painter: _CKLogoPainter(
-                glowIntensity: _hovered ? 0.8 : 0.0,
-              ),
-            ),
+            child: const HtmlElementView(viewType: 'ck-logo-svg'),
           ),
         ),
       ),
     );
-  }
-}
-
-// ──────────────────────────────────────────────
-// CK Monogram — CustomPainter (SVG → Canvas)
-// ──────────────────────────────────────────────
-class _CKLogoPainter extends CustomPainter {
-  final double glowIntensity;
-
-  _CKLogoPainter({this.glowIntensity = 0.0});
-
-  @override
-  void paint(Canvas canvas, Size size) {
-    // Scale from SVG viewBox (240×240) to widget size
-    final double s = size.width / 240.0;
-
-    // Gradient — exact match to original SVG (#00d4ff → #00ffaa)
-    final gradient = ui.Gradient.linear(
-      Offset.zero,
-      Offset(size.width, size.height),
-      [
-        const Color(0xFF00D4FF), // Original SVG start color
-        const Color(0xFF00FFAA), // Original SVG end color
-      ],
-    );
-
-    final paint = Paint()
-      ..shader = gradient
-      ..style = PaintingStyle.stroke
-      ..strokeWidth = 22 * s
-      ..strokeCap = StrokeCap.round
-      ..strokeJoin = StrokeJoin.round;
-
-    // Optional glow layer on hover
-    if (glowIntensity > 0) {
-      final glowPaint = Paint()
-        ..shader = gradient
-        ..style = PaintingStyle.stroke
-        ..strokeWidth = 28 * s
-        ..strokeCap = StrokeCap.round
-        ..strokeJoin = StrokeJoin.round
-        ..maskFilter = MaskFilter.blur(BlurStyle.normal, 4 * glowIntensity);
-      _drawLogo(canvas, s, glowPaint);
-    }
-
-    // Main logo strokes
-    _drawLogo(canvas, s, paint);
-  }
-
-  void _drawLogo(Canvas canvas, double s, Paint paint) {
-    // "C" — arc path
-    final cPath = Path();
-    cPath.moveTo(129.96 * s, 81.43 * s);
-    cPath.arcToPoint(
-      Offset(129.96 * s, 158.57 * s),
-      radius: Radius.circular(60 * s),
-      largeArc: true,
-      clockwise: false,
-    );
-    canvas.drawPath(cPath, paint);
-
-    // "K" — vertical stem
-    canvas.drawLine(
-      Offset(156 * s, 60 * s),
-      Offset(156 * s, 180 * s),
-      paint,
-    );
-
-    // "K" — upper diagonal arm
-    canvas.drawLine(
-      Offset(156 * s, 120 * s),
-      Offset(216 * s, 60 * s),
-      paint,
-    );
-
-    // "K" — lower diagonal arm
-    canvas.drawLine(
-      Offset(156 * s, 120 * s),
-      Offset(216 * s, 180 * s),
-      paint,
-    );
-  }
-
-  @override
-  bool shouldRepaint(covariant _CKLogoPainter oldDelegate) {
-    return oldDelegate.glowIntensity != glowIntensity;
   }
 }
 

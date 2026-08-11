@@ -55,6 +55,7 @@ builder.Services.AddSingleton<IFileSanitizer, FileSanitizerService>();
 builder.Services.AddSingleton<IXssSanitizer, XssSanitizerService>();
 builder.Services.AddScoped<ISecureFileStorageService, SecureFileStorageService>();
 builder.Services.AddScoped<IAuditLogService, AuditLogService>();
+builder.Services.AddSingleton<IEmailService, BrevoEmailService>();
 
 // 3. Configure JWT Authentication & Authorization
 var jwtSettings = builder.Services.BuildServiceProvider().GetRequiredService<JwtTokenSettings>();

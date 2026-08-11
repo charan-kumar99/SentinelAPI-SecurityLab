@@ -7,6 +7,9 @@ out/
 *.user
 *.userosscache
 *.sln.docstates
+appsettings.Development.json
+appsettings.*.json
+!appsettings.json
 
 # Flutter ignore
 .dart_tool/
