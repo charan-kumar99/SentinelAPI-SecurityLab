@@ -23,8 +23,9 @@ var builder = WebApplication.CreateBuilder(args);
 
 // 1. Database Configuration (Uses PostgreSQL when connection string is provided, or in-memory if specified)
 bool useInMemory = builder.Configuration.GetValue<bool>("UseInMemoryDatabase", false);
-string connectionString = builder.Configuration.GetConnectionString("DefaultConnection") 
+string rawConnectionString = builder.Configuration.GetConnectionString("DefaultConnection") 
     ?? "Host=localhost;Port=5433;Database=sentinel_db;Username=secuser;Password=SecLabPass2026!";
+string connectionString = NormalizePostgresConnectionString(rawConnectionString);
 
 builder.Services.AddDbContext<AppDbContext>(options =>
 {
@@ -197,3 +198,30 @@ app.UseRateLimiter();
 app.MapControllers();
 
 app.Run();
+
+static string NormalizePostgresConnectionString(string connStr)
+{
+    if (string.IsNullOrWhiteSpace(connStr)) return connStr;
+    connStr = connStr.Trim();
+    if (connStr.StartsWith("postgresql://", StringComparison.OrdinalIgnoreCase) ||
+        connStr.StartsWith("postgres://", StringComparison.OrdinalIgnoreCase))
+    {
+        try
+        {
+            var uri = new Uri(connStr);
+            var userInfo = uri.UserInfo.Split(':');
+            string username = Uri.UnescapeDataString(userInfo[0]);
+            string password = userInfo.Length > 1 ? Uri.UnescapeDataString(userInfo[1]) : "";
+            string database = uri.AbsolutePath.TrimStart('/');
+            if (string.IsNullOrEmpty(database)) database = "postgres";
+            int port = uri.Port > 0 ? uri.Port : 5432;
+
+            return $"Host={uri.Host};Port={port};Database={database};Username={username};Password={password};SSL Mode=Require;Trust Server Certificate=true;";
+        }
+        catch
+        {
+            return connStr;
+        }
+    }
+    return connStr;
+}
