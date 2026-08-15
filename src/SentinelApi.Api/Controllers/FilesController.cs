@@ -25,7 +25,8 @@ public class FilesController : ControllerBase
 
     [Authorize]
     [HttpPost("upload")]
-    public async Task<IActionResult> UploadFile([FromForm] IFormFile file)
+    [Consumes("multipart/form-data")]
+    public async Task<IActionResult> UploadFile(IFormFile file)
     {
         if (file == null || file.Length == 0)
         {

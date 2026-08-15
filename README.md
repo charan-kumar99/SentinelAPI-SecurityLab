@@ -6,6 +6,21 @@ Designed to demonstrate production-grade implementation of **OWASP API Security 
 
 ---
 
+## 🌐 Live API & Swagger Documentation
+
+The API is deployed on **Render** and publicly accessible:
+
+| Resource | URL |
+| :--- | :--- |
+| **🔗 Live API Base URL** | [`https://sentinel-api-zl7e.onrender.com`](https://sentinel-api-zl7e.onrender.com) |
+| **📖 Swagger UI (Interactive API Docs)** | [`https://sentinel-api-zl7e.onrender.com/swagger`](https://sentinel-api-zl7e.onrender.com/swagger) |
+| **📄 OpenAPI JSON Spec** | [`https://sentinel-api-zl7e.onrender.com/swagger/v1/swagger.json`](https://sentinel-api-zl7e.onrender.com/swagger/v1/swagger.json) |
+| **💙 Flutter Security Workbench** | [`https://sentinel-api-zl7e.onrender.com`](https://sentinel-api-zl7e.onrender.com) (root) |
+
+> **Tip:** Import the OpenAPI JSON URL into **Postman** or **Insomnia** to auto-generate an API collection with all endpoints.
+
+---
+
 ## 🔒 Cyber Security Controls Implemented
 
 | Security Control | Technology / Algorithm | Defensive Implementation |
